@@ -22,12 +22,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     TextView textX, textY, textZ;
     private SensorManager sensorManager;
     private Sensor sensor;
-    private float mLastX, mLastY, mLastZ;
-    private boolean mInitialized;
-    private final float NOISE = (float) 8.0;
     AlertDialog.Builder builder;
     Random rand;
     int n;
+    Boolean isShow = false;
     Resources res;
     String[] array;
     float x, y, z;
@@ -47,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mInitialized = false;
+        isShow = false;
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
@@ -69,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void dialogs() {
+        if(!isShow){
+            isShow = true;
         accelLatest = accelNow;
         accelNow = (float) Math.sqrt((double) (x*x + y*y + z*z));
         float subtraction = accelNow - accelLatest;
@@ -78,14 +78,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (accel > 6) {
             final AlertDialog.Builder viewDialog = new AlertDialog.Builder(MainActivity.this);
             viewDialog.setTitle("คำทำนาย");
-            viewDialog.setMessage("คุณได้หมายเลข : "+(n+1)+"\n"+array[n]);
+            viewDialog.setMessage("คุณได้หมายเลข : " + (n + 1) + "\n" + array[n]);
             viewDialog.setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     dialogInterface.dismiss();
+                    isShow = false;
                 }
             });
             viewDialog.show();
+        }
         }//end if
     }//end method
 
