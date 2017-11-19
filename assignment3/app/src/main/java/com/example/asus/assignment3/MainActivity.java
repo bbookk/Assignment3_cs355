@@ -13,13 +13,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-
 import java.util.Random;
+
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
-    TextView textX, textY, textZ;
     private SensorManager sensorManager;
     private Sensor sensor;
     AlertDialog.Builder builder;
@@ -37,19 +35,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Runnable pollTask = new Runnable() {
         public void run() {
             dialogs();
-            hdr.postDelayed(pollTask, 10000);
+            hdr.postDelayed(pollTask, 4000);
         }
     };
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        isShow = false;
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-
+        isShow = false;
         res = getResources();
         array = res.getStringArray(R.array.result);
         builder = new AlertDialog.Builder(MainActivity.this);
@@ -67,27 +63,27 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void dialogs() {
-        if(!isShow){
-            isShow = true;
         accelLatest = accelNow;
         accelNow = (float) Math.sqrt((double) (x*x + y*y + z*z));
         float subtraction = accelNow - accelLatest;
-        accel = accel * 0.9f + subtraction; // perform low-cut filter
+        accel = accel * 0.9f + subtraction;
         rand = new Random();
         n = rand.nextInt(10);
-        if (accel > 6) {
-            final AlertDialog.Builder viewDialog = new AlertDialog.Builder(MainActivity.this);
-            viewDialog.setTitle("คำทำนาย");
-            viewDialog.setMessage("คุณได้หมายเลข : " + (n + 1) + "\n" + array[n]);
-            viewDialog.setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    isShow = false;
-                }
-            });
-            viewDialog.show();
-        }
+        if (Math.abs(accel) > 6) {
+            if(!isShow){
+                isShow = true;
+                final AlertDialog.Builder viewDialog = new AlertDialog.Builder(MainActivity.this);
+                viewDialog.setTitle("คำทำนาย");
+                viewDialog.setMessage("คุณได้หมายเลข : " + (n + 1) + "\n" + array[n]);
+                viewDialog.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        isShow = false;
+                    }
+                });
+                viewDialog.show();
+            }
         }//end if
     }//end method
 
@@ -109,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // can be safely ignored for this demo
+
     }
 
 
@@ -120,8 +116,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             x = event.values[0];
             y = event.values[1];
             z = event.values[2];
+//            accelLatest = accelNow;
+//            accelNow = (float) Math.sqrt((double) (x*x + y*y + z*z));
+//            float subtraction = accelNow - accelLatest;
+//            accel = accel * 0.9f + subtraction;
         }
     }
 }
+
 
 
